@@ -1,2 +1,3 @@
 prepare:
-	ansible-playbook -i inventory.ini playbook.yml -v
+	ansible-galaxy install -r requirements.yml
+	ansible-playbook -i inventory.ini playbook.yml
