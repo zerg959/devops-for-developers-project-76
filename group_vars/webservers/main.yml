@@ -1,1 +1,5 @@
+---
+pip_install_packages:
+  - name: docker
+
 redmine_port: 8080
