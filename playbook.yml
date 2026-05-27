@@ -1,26 +1,7 @@
 ---
-- hosts: all
-  become: yes
-
-  tasks:
-    - name: Copy .env file to server
-      copy:
-        src: .env
-        dest: /tmp/redmine.env
-        mode: '0600'
-
-    - name: Pull Redmine Docker image
-      docker_image:
-        name: redmine
-        source: pull
-
-    - name: Run Redmine container using env_file
-      docker_container:
-        name: redmine
-        image: redmine
-        state: started
-        recreate: yes
-        ports:
-          - "{{ redmine_port }}:3000"
-        env_file: /tmp/redmine.env
-        restart_policy: always
+- name: Prepare servers
+  hosts: all
+  become: true
+  roles:
+    - geerlingguy.pip
+    - geerlingguy.docker
