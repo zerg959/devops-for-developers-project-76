@@ -1,0 +1,37 @@
+---
+- name: Deploy Redmine
+  hosts: webservers
+  become: true
+  tasks:
+    - name: Create .env file
+      ansible.builtin.copy:
+        content: |
+          REDMINE_DB_POSTGRES=postgres
+          REDMINE_DB_USERNAME=redmine
+          REDMINE_DB_PASSWORD={{ redmine_db_password }}
+          REDMINE_DB_DATABASE=redmine
+        dest: /opt/redmine.env
+        mode: '0600'
+
+    - name: Run PostgreSQL
+      community.docker.docker_container:
+        name: redmine-db
+        image: postgres:14-alpine
+        env:
+          POSTGRES_USER: redmine
+          POSTGRES_PASSWORD: "{{ redmine_db_password }}"
+          POSTGRES_DB: redmine
+        volumes:
+          - db-data:/var/lib/postgresql/data
+        state: started
+
+    - name: Run Redmine
+      community.docker.docker_container:
+        name: redmine
+        image: redmine:5.0
+        env_file: /opt/redmine.env
+        published_ports:
+          - "{{ redmine_port }}:3000"
+        links:
+          - redmine-db:postgres
+        state: started
